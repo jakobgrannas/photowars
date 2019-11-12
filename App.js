@@ -1,21 +1,32 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Camera from './src/Camera';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
+import ProfileScreen from './src/ProfileScreen';
+import AssassinateScreen from './src/AssassinateScreen';
+
 
 export default class App extends Component {
   state = {
-    showCamera: true
+    index: 0,
+    routes: [
+      { key: 'profile', title: 'Profile' },
+      { key: 'assassinate', title: 'Assassinate' },
+    ],
   };
 
-  handleClose = () => {
-    this.setState({ showCamera: false });
-  }
-
   render() {
+    //<View style={styles.container}>
     return (
-      <View style={styles.container}>
-        {this.state.showCamera && <Camera onClose={this.handleClose}/>}
-      </View>
+      <TabView
+        navigationState={this.state}
+        tabBarPosition="bottom"
+        renderScene={SceneMap({
+          profile: () => <ProfileScreen />,
+          assassinate: () => <AssassinateScreen />,
+        })}
+        onIndexChange={index => this.setState({ index })}
+        initialLayout={{ width: Dimensions.get('window').width }}
+      />
     );
   }
 }

@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Button } from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 
 class CameraView extends Component {
+  static propTypes = {
+    onPictureTaken: PropTypes.func.isRequired
+  }
+
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.back,
@@ -24,12 +29,12 @@ class CameraView extends Component {
   takePicture = async () => {
     if(this.camera) {
       const photo = await this.camera.takePictureAsync();
-      console.log(photo);
+      this.props.onPictureTaken(photo);
 
       // TODO: This shouldn't belong in the Camera component since it will be reused
-      this.setState({
+      /*this.setState({
         photoUri: photo.uri
-      });
+      });*/
     }
   }
 
@@ -78,7 +83,7 @@ class CameraView extends Component {
       return (
         <View style={styles.container}>
           {this.state.photoUri && this.renderImagePopup()}
-          <TouchableOpacity style={styles.closeButton} onPress={this.props.onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={this.props.onClose || null}>
             <Text style={{ color: 'white', fontSize: 28 }}>x</Text>
           </TouchableOpacity>
           <Camera style={styles.camera} type={this.state.type} ref={this.cameraRef}>
