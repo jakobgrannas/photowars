@@ -4,19 +4,23 @@ import { StyleSheet, Text, View, TouchableOpacity, Image, Button } from 'react-n
 import * as Permissions from 'expo-permissions';
 import { Camera } from 'expo-camera';
 
+import swordsIcon from './assets/swords.png';
+import cameraIcon from './assets/camera.png';
+
+
 class CameraView extends Component {
   static propTypes = {
     onPictureTaken: PropTypes.func.isRequired
   }
 
-  state = {
-    hasCameraPermission: null,
-    type: Camera.Constants.Type.back,
-    photoUri: null
-  };
-
   constructor(props) {
     super(props);
+
+    this.state = {
+      hasCameraPermission: null,
+      type: props.selfie ? Camera.Constants.Type.front : Camera.Constants.Type.back,
+      photoUri: null
+    };
 
     this.camera = React.createRef();
   }
@@ -27,6 +31,7 @@ class CameraView extends Component {
   }
 
   takePicture = async () => {
+    this.setState({ takingPhoto: true })
     if(this.camera) {
       const photo = await this.camera.takePictureAsync({ exif: true });
       this.props.onPictureTaken(photo);
@@ -88,11 +93,19 @@ class CameraView extends Component {
           </TouchableOpacity>
           <Camera style={styles.camera} type={this.state.type} ref={this.cameraRef}>
             <View style={styles.controls}>
-              <TouchableOpacity style={styles.shutterButton} onPress={this.takePicture} />
-
-              <TouchableOpacity style={styles.flipCamera} onPress={this.flipCamera}>
-                <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}> Flip </Text>
+              <TouchableOpacity style={styles.shutterButton} onPress={this.takePicture}>
+                <Image
+                  style={styles.swords}
+                  source={this.state.type === Camera.Constants.Type.back ? swordsIcon : cameraIcon}
+                />
               </TouchableOpacity>
+
+              {!this.props.selfie &&
+                <TouchableOpacity style={styles.flipCamera} onPress={this.flipCamera}>
+                  <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}> Flip </Text>
+                </TouchableOpacity>
+              }
+
             </View>
           </Camera>
         </View>
@@ -196,8 +209,14 @@ const styles = StyleSheet.create({
     width: SHUTTER_BUTTON_SIZE,
     height: SHUTTER_BUTTON_SIZE,
     borderRadius: SHUTTER_BUTTON_SIZE/2,
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
+  swords: {
+    width: SHUTTER_BUTTON_SIZE - 20,
+    height: SHUTTER_BUTTON_SIZE - 20,
+    marginLeft: 10,
+    marginTop: 10
+  }
 });
 
 export default CameraView;
