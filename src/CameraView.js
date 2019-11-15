@@ -28,7 +28,7 @@ class CameraView extends Component {
 
   takePicture = async () => {
     if(this.camera) {
-      const photo = await this.camera.takePictureAsync();
+      const photo = await this.camera.takePictureAsync({ exif: true });
       this.props.onPictureTaken(photo);
 
       // TODO: This shouldn't belong in the Camera component since it will be reused

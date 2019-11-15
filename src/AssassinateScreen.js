@@ -2,24 +2,43 @@ import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import CameraView from './CameraView';
 import { Hit } from './Assassination';
+import { postKill } from './api';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 class AssassinateScreen extends Component {
   state = {
     isHit: false,
+    hitUsername: null,
+    userPhotoUrl: null,
     showModal: false,
     photoUri: null // This should come from the server
   };
 
 
-  handlePictureTaken = ({ uri, height, width }) => {
-    console.log('photo url', uri);
+  handlePictureTaken = async (capturedPhoto) => {
+    // Hack to fix a bug where the image is saved as Orientation: -90deg in portrait
+    const { uri } = await ImageManipulator.manipulateAsync(capturedPhoto.uri, [{ rotate: 0 }]);
 
-    // TODO: Get hit or miss from server
+    const formData = new FormData();
+    formData.append('File', { uri, name: 'kill.jpg', type: 'image/jpg' });
 
-    this.setState({
-      isHit: true,
-      photoUri: uri
-    });
+
+    console.log('formDatas', formData);
+
+    postKill(formData)
+      .then(({ data }) => {
+        const { username, photo, isHit } = data || {};
+        const photoUrl = photo && photo.url || null;
+        console.log('yay, saved!', data);
+
+        this.setState({
+          hitUsername: username,
+          isHit,
+          userPhotoUrl: photoUrl
+        });
+      })
+      .catch(console.error);
+
   }
 
   handleModalClose = () => {

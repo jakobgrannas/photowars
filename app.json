@@ -25,6 +25,9 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "extra": {
+      "apiBaseUrl": "http://localhost:5066"
     }
   }
 }
