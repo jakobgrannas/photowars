@@ -28,6 +28,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "We need access to your photos in order to choose a profile picture"
+        }
+      ]
+    ]
   }
 }

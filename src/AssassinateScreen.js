@@ -19,6 +19,8 @@ class AssassinateScreen extends Component {
     // Hack to fix a bug where the image is saved as Orientation: -90deg in portrait
     const { uri } = await ImageManipulator.manipulateAsync(capturedPhoto.uri, [{ rotate: 0 }]);
 
+    console.log('uri', uri);
+
     const formData = new FormData();
     formData.append('File', { uri, name: 'kill.jpg', type: 'image/jpg' });
 

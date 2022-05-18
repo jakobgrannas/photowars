@@ -1,11 +1,9 @@
 import { API_BASE_URL } from '@env';
 
-// const { apiBaseUrl } = Constants.manifest.extra;
-console.log('baseUrl ', API_BASE_URL);
-const API_POST_KILL = `${API_BASE_URL}/kill`;
+console.log('pAPI_BASE_URL=', API_BASE_URL);
 
 export function postKill(data) {
-  return fetch(API_POST_KILL, {
+  return fetch(`${API_BASE_URL}/kill`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -15,4 +13,17 @@ export function postKill(data) {
   })
     .then(res => res.json())
     .catch(console.error);
-} 
+}
+
+export function signup(data) {
+  return fetch(`${API_BASE_URL}/user/add`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    },
+    body: data,
+  })
+    .then(res => res.json())
+    .catch(console.error);
+}
