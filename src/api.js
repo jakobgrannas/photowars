@@ -1,11 +1,11 @@
-import Constants from 'expo-constants';
+import { API_BASE_URL } from '@env';
 
-const { apiBaseUrl } = Constants.manifest.extra;
-console.log(apiBaseUrl);
-const API_POST_KILL = `${apiBaseUrl}/kill`;
+// const { apiBaseUrl } = Constants.manifest.extra;
+console.log('baseUrl ', API_BASE_URL);
+const API_POST_KILL = `${API_BASE_URL}/kill`;
 
 export function postKill(data) {
-  return fetch('http://192.168.201.109:5066/kill', {
+  return fetch(API_POST_KILL, {
     method: 'POST',
     headers: {
       Accept: 'application/json',

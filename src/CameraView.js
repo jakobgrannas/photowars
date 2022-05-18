@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Button } from 'react-native';
-import * as Permissions from 'expo-permissions';
-import { Camera } from 'expo-camera';
+import { Camera, CameraType } from 'expo-camera';
 
 class CameraView extends Component {
   static propTypes = {
@@ -11,7 +10,7 @@ class CameraView extends Component {
 
   state = {
     hasCameraPermission: null,
-    type: Camera.Constants.Type.back,
+    type: CameraType.back,
     photoUri: null
   };
 
@@ -22,11 +21,12 @@ class CameraView extends Component {
   }
 
   async componentDidMount() {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
+    const { status } = await Camera.requestCameraPermissionsAsync();
     this.setState({ hasCameraPermission: status === 'granted' });
   }
 
   takePicture = async () => {
+    console.log('picture taken');
     if(this.camera) {
       const photo = await this.camera.takePictureAsync({ exif: true });
       this.props.onPictureTaken(photo);
@@ -40,9 +40,9 @@ class CameraView extends Component {
 
   flipCamera = () => {
     this.setState({
-      type: this.state.type === Camera.Constants.Type.back
-          ? Camera.Constants.Type.front
-          : Camera.Constants.Type.back,
+      type: this.state.type === CameraType.back
+          ? CameraType.front
+          : CameraType.back,
     });
   }
 
