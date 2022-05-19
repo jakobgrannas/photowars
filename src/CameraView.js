@@ -1,107 +1,118 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Text, View, TouchableOpacity, Image, Button } from 'react-native';
+import {
+  StyleSheet,
+  ScrollView,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Button,
+  useWindowDimensions
+} from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
+import { MaterialIcons } from '@expo/vector-icons';
+// static propTypes = {
+//   onPictureTaken: PropTypes.func.isRequired
+// }
 
-class CameraView extends Component {
-  static propTypes = {
-    onPictureTaken: PropTypes.func.isRequired
-  }
+const CameraView = ({ onClose, onPictureTaken }) => {
+  const { height, width: windowWidth } = useWindowDimensions();
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
+  const [type, setType] = useState(CameraType.back);
+  const [photoUri, setPhotoUri] = useState(null);
+  const cameraRef = useRef(null);
 
-  state = {
-    hasCameraPermission: null,
-    type: CameraType.back,
-    photoUri: null
-  };
+  // constructor(props) {
+  //   super(props);
 
-  constructor(props) {
-    super(props);
+  //   this.camera = React.createRef();
+  // }
 
-    this.camera = React.createRef();
-  }
+  // async componentDidMount() {
+  //   const { status } = await Camera.requestCameraPermissionsAsync();
+  //   this.setState({ hasCameraPermission: status === 'granted' });
+  // }
+  
+  useEffect(() => {
+    Camera.requestCameraPermissionsAsync().then(({ status }) => {
+      setHasCameraPermission(status === 'granted');
+    });
+  })
 
-  async componentDidMount() {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    this.setState({ hasCameraPermission: status === 'granted' });
-  }
-
-  takePicture = async () => {
-    console.log('picture taken');
-    if(this.camera) {
-      const photo = await this.camera.takePictureAsync({ exif: true });
-      this.props.onPictureTaken(photo);
+  const takePicture = useCallback(async () => {
+    console.log('picture taken', cameraRef);
+    if(cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync({ exif: true });
+      onPictureTaken(photo);
 
       // TODO: This shouldn't belong in the Camera component since it will be reused
       /*this.setState({
         photoUri: photo.uri
       });*/
     }
-  }
+  }, []);
 
-  flipCamera = () => {
-    this.setState({
-      type: this.state.type === CameraType.back
-          ? CameraType.front
-          : CameraType.back,
-    });
-  }
+  const flipCamera = useCallback(() => {
+    setType(type === CameraType.back ? CameraType.front : CameraType.back);
+  }, [type]);
 
-  uploadPicture = () => {
+  const uploadPicture = () => {
     // TODO: Do something
   }
 
-  cancelUpload = () => this.setState({ photoUri: null });
+  const cancelUpload = () => setPhotoUri(null);
 
-  cameraRef = ref => {
-    this.camera = ref;
-  }
-
-  renderImagePopup() {
+  const renderImagePopup = useCallback(() => {
     return (
       <View style={styles.popupBackground}>
         <View style={styles.popup}>
-          <Image style={styles.profilePic} source={{ uri: this.state.photoUri }} />
+          <Image style={styles.profilePic} source={{ uri: photoUri }} />
           <View style={styles.confirmButton}>
-            <Button title="Confirm" color="#ffffff" onPress={this.uploadPicture} />
+            <Button title="Confirm" color="#ffffff" onPress={uploadPicture} />
           </View>
           <View style={styles.cancelButton}>
-            <Button title="Cancel" color="#777" onPress={this.cancelUpload} />
+            <Button title="Cancel" color="#777" onPress={cancelUpload} />
           </View>
         </View>
       </View>
     );
-  }
+  }, [photoUri, uploadPicture, cancelUpload]);
 
-  render() {
-    const { hasCameraPermission } = this.state;
-
-    if (hasCameraPermission === null) {
-      return null;
-    } else if (hasCameraPermission === false) {
-      return <Text>No access to camera</Text>;
-    } else {
-      return (
-        <View style={styles.container}>
-          {this.state.photoUri && this.renderImagePopup()}
-          <TouchableOpacity style={styles.closeButton} onPress={this.props.onClose || null}>
-            <Text style={{ color: 'white', fontSize: 28 }}>x</Text>
-          </TouchableOpacity>
-          <Camera style={styles.camera} type={this.state.type} ref={this.cameraRef}>
-            <View style={styles.controls}>
-              <TouchableOpacity style={styles.shutterButton} onPress={this.takePicture} />
-
-              <TouchableOpacity style={styles.flipCamera} onPress={this.flipCamera}>
-                <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}> Flip </Text>
+  if (hasCameraPermission === null) {
+    return null;
+  } else if (hasCameraPermission === false) {
+    return <Text>No access to camera</Text>;
+  } else {
+    return (
+      <View style={styles.container}>
+        {photoUri && renderImagePopup()}
+        <TouchableOpacity style={styles.closeButton} onPress={onClose || null}>
+          <Text style={{ color: 'white', fontSize: 28 }}>x</Text>
+        </TouchableOpacity>
+        <Camera style={styles.camera} type={type} ref={cameraRef}>
+          <View style={styles.controls}>
+            <ScrollView
+              horizontal
+              directionalLockEnabled
+              style={styles.weaponScrollView}
+              contentContainerStyle={styles.weaponViewContent}
+              contentInset={{top: 0, left: windowWidth/2 - 60, bottom: 0, right: 0}}
+            >
+              <TouchableOpacity onPress={takePicture}>
+                <Image source={require('../assets/pie.png')} style={styles.pie} />
               </TouchableOpacity>
-            </View>
-          </Camera>
-        </View>
-      );
-    }
+            </ScrollView>
+
+            <TouchableOpacity style={styles.flipCamera} onPress={flipCamera}>
+              <MaterialIcons name="flip-camera-ios" size={32} style={{ marginRight: 20, marginBottom: 20 }} color="white" />
+            </TouchableOpacity>
+          </View>
+        </Camera>
+      </View>
+    );
   }
 }
-
-const SHUTTER_BUTTON_SIZE = 80;
 
 const styles = StyleSheet.create({
   container: {
@@ -109,14 +120,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
 
-
   closeButton: {
     position: 'absolute',
     top: 20,
     right: 20,
     zIndex: 10,
   },
-
 
   popupBackground: {
     position: 'absolute',
@@ -192,12 +201,20 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
   },
-  shutterButton: {
-    width: SHUTTER_BUTTON_SIZE,
-    height: SHUTTER_BUTTON_SIZE,
-    borderRadius: SHUTTER_BUTTON_SIZE/2,
-    backgroundColor: '#fff',
+  weaponScrollView: {
+    height: 80,
+    flex: 1,
+    marginBottom: 20
   },
+  weaponViewContent: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  pie: {
+    width: 106.66,
+    height: 63.33,
+    resizeMode: 'contain',
+  }
 });
 
 export default CameraView;
