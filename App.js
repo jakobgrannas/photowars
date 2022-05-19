@@ -6,16 +6,14 @@ import SignupScreen from './src/screens/SignupScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-
-
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   const [signupCompleted, setSignupCompleted] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem('signupCompleted').then((hasCompletedSignup) => {
-      if (hasCompletedSignup === 'true') {
+    AsyncStorage.getItem('signupCompleted').then((userId) => {
+      if (Boolean(userId)) {
         setSignupCompleted(true)
       }
     });
@@ -35,16 +33,18 @@ const App = () => {
           },
         }}
       >
-        {!signupCompleted && <Stack.Screen name="SignupScreen" component={SignupScreen} options={({ navigation }) => ({
-          title: 'Signup',
-          headerLeft: () => (
-            <Button
-              onPress={() => navigation.navigate('AssassinateScreen')}
-              title="Ass"
-              color="#fff"
-            />
-          )
-        })} />}
+        {!signupCompleted && (
+          <Stack.Screen name="SignupScreen" component={SignupScreen} options={({ navigation }) => ({
+            title: 'Signup',
+            headerLeft: () => (
+              <Button
+                onPress={() => navigation.navigate('AssassinateScreen')}
+                title="Ass"
+                color="#fff"
+              />
+            )
+          })} />
+        )}
         <Stack.Screen name="AssassinateScreen" component={AssassinateScreen} options={{
           title: 'Assassin mode',
           headerLeft: ({ navigation }) => (

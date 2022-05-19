@@ -46,16 +46,16 @@ const SignupScreen = () => {
     formData.append('name', name);
     console.log(formData);
 
-    const res = await signup(formData);
-    if (res.status === 'success') {
+    const { status, data } = await signup(formData);
+    console.log('signup res', data);
+    if (status === 'success') {
       setComplete(true);
 
       // AsyncStorage value has to be a string
-      await AsyncStorage.setItem('signupCompleted', 'true');
+      await AsyncStorage.setItem('signupCompleted', data?.user?._id);
 
       setTimeout(() => navigation.navigate('AssassinateScreen'), 1000)
     }
-    console.log('signup res', res);
   };
 
   const onUploadPress = async () => {
