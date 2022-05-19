@@ -3,7 +3,7 @@ import { StatusBar, Button, AsyncStorage } from 'react-native';
 import ProfileScreen from './src/ProfileScreen';
 import AssassinateScreen from './src/AssassinateScreen';
 import SignupScreen from './src/screens/SignupScreen';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
@@ -12,6 +12,7 @@ const App = () => {
   const [signupCompleted, setSignupCompleted] = useState(false);
 
   useEffect(() => {
+    // AsyncStorage.removeItem('signupCompleted'); // Debug stuff
     AsyncStorage.getItem('signupCompleted').then((userId) => {
       if (Boolean(userId)) {
         setSignupCompleted(true)

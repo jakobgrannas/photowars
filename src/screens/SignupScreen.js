@@ -46,7 +46,13 @@ const SignupScreen = () => {
     formData.append('name', name);
     console.log(formData);
 
-    const { status, data } = await signup(formData);
+    let res = {};
+    try {
+      res = await signup(formData);
+    } catch(e) {
+      setLoading(false);
+    }
+    const { status, data } = res;
     console.log('signup res', data);
     if (status === 'success') {
       setComplete(true);

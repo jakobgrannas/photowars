@@ -87,9 +87,9 @@ const CameraView = ({ onClose, onPictureTaken }) => {
     return (
       <View style={styles.container}>
         {photoUri && renderImagePopup()}
-        <TouchableOpacity style={styles.closeButton} onPress={onClose || null}>
+        {/* <TouchableOpacity style={styles.closeButton} onPress={onClose || null}>
           <Text style={{ color: 'white', fontSize: 28 }}>x</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Camera style={styles.camera} type={type} ref={cameraRef}>
           <View style={styles.controls}>
             <ScrollView

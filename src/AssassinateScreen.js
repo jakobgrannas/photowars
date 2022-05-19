@@ -4,6 +4,7 @@ import CameraView from './CameraView';
 import { Hit } from './Assassination';
 import { postKill } from './api';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { API_BASE_URL } from '@env';
 
 class AssassinateScreen extends Component {
   state = {
@@ -11,7 +12,6 @@ class AssassinateScreen extends Component {
     hitUsername: null,
     userPhotoUrl: null,
     showModal: false,
-    photoUri: null // This should come from the server
   };
 
 
@@ -24,19 +24,22 @@ class AssassinateScreen extends Component {
     const formData = new FormData();
     formData.append('File', { uri, name: 'kill.jpg', type: 'image/jpg' });
 
+    // TODO: Save kill for assassin
+    // formData.append('assassinUserId', )
+
 
     console.log('formDatas', formData);
 
     postKill(formData)
       .then(({ data }) => {
-        const { username, photo, isHit } = data || {};
-        const photoUrl = photo && photo.url || null;
-        console.log('yay, saved!', data);
+        const { username, photoUrl, isHit } = data || {};
+        const url = photoUrl ? `${API_BASE_URL}/${photoUrl}` : null;
+        console.log('yay, saved!', data, url);
 
         this.setState({
           hitUsername: username,
           isHit,
-          userPhotoUrl: photoUrl
+          userPhotoUrl: url
         });
       })
       .catch(console.error);
@@ -54,7 +57,8 @@ class AssassinateScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.isHit && <Hit photoUri={this.state.photoUri} onClose={this.handleModalClose} />}
+        {this.state.isHit && <Hit photoUri={this.state.userPhotoUrl} username={this.state.hitUsername} onClose={this.handleModalClose} />}
+        {/* {<Hit photoUri={this.state.userPhotoUrl} onClose={this.handleModalClose} />} */}
         <CameraView onPictureTaken={this.handlePictureTaken} />
       </View>
     )
