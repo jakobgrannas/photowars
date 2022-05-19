@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Text, Image, View, StyleSheet, ScrollView, TextInput, TouchableHighlight, KeyboardAvoidingView } from "react-native";
+import {
+  Text,
+  Image,
+  View,
+  StyleSheet,
+  AsyncStorage,
+  TextInput,
+  TouchableHighlight,
+  KeyboardAvoidingView
+} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { launchImageLibraryAsync } from 'expo-image-picker';
 import Button from '../components/Button';
@@ -40,6 +49,10 @@ const SignupScreen = () => {
     const res = await signup(formData);
     if (res.status === 'success') {
       setComplete(true);
+
+      // AsyncStorage value has to be a string
+      await AsyncStorage.setItem('signupCompleted', 'true');
+
       setTimeout(() => navigation.navigate('AssassinateScreen'), 1000)
     }
     console.log('signup res', res);

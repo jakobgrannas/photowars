@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '@env';
 
-console.log('pAPI_BASE_URL=', API_BASE_URL);
+console.log('API_BASE_URL= ', API_BASE_URL);
 
 export function postKill(data) {
   return fetch(`${API_BASE_URL}/kill`, {

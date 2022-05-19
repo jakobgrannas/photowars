@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Button, View, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StatusBar, Button, AsyncStorage } from 'react-native';
 import ProfileScreen from './src/ProfileScreen';
 import AssassinateScreen from './src/AssassinateScreen';
 import SignupScreen from './src/screens/SignupScreen';
@@ -11,17 +11,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  // const navState = useState({
-  //   index: 0,
-  //   routes: [
-  //     { key: 'profile', title: 'Profile' },
-  //     { key: 'assassinate', title: 'Assassinate' },
-  //   ],
-  // });
+  const [signupCompleted, setSignupCompleted] = useState(false);
 
-  //<View style={styles.container}>
+  useEffect(() => {
+    AsyncStorage.getItem('signupCompleted').then((hasCompletedSignup) => {
+      if (hasCompletedSignup === 'true') {
+        setSignupCompleted(true)
+      }
+    });
+  });
+
   return (
     <NavigationContainer>
+      <StatusBar barStyle="light-content" />
       <Stack.Navigator 
         screenOptions={{
           headerStyle: {
@@ -33,7 +35,8 @@ const App = () => {
           },
         }}
       >
-        <Stack.Screen name="SignupScreen" component={SignupScreen} options={({ navigation }) => ({
+        {!signupCompleted && <Stack.Screen name="SignupScreen" component={SignupScreen} options={({ navigation }) => ({
+          title: 'Signup',
           headerLeft: () => (
             <Button
               onPress={() => navigation.navigate('AssassinateScreen')}
@@ -41,8 +44,9 @@ const App = () => {
               color="#fff"
             />
           )
-        })} />
+        })} />}
         <Stack.Screen name="AssassinateScreen" component={AssassinateScreen} options={{
+          title: 'Assassin mode',
           headerLeft: ({ navigation }) => (
             <Button
               onPress={() => navigation.navigate('ProfileScreen')}
@@ -54,26 +58,7 @@ const App = () => {
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
-    // <TabView
-    //   navigationState={this.state}
-    //   tabBarPosition="bottom"
-    //   renderScene={SceneMap({
-    //     profile: () => <ProfileScreen />,
-    //     assassinate: () => <AssassinateScreen />,
-    //   })}
-    //   onIndexChange={index => this.setState({ index })}
-    //   initialLayout={{ width: Dimensions.get('window').width }}
-    // />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-});
 
 export default App;
